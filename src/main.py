@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import json
+import subprocess
 
 from datetime import timedelta
 from timeloop import Timeloop
@@ -130,6 +131,13 @@ def renderNRE(xOffset):
 
     return drawText
 
+def renderIpAddress(xOffset, ip_address):
+    def drawText(draw, width, height):
+        text = "IP: %s" % ip_address
+        draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
+
+    return drawText
+
 def renderName(xOffset):
     def drawText(draw, width, height):
         text = "UK Train Departure Display"
@@ -172,14 +180,17 @@ def loadData(apiConfig, journeyConfig, config):
 def drawStartup(device, width, height):
     virtualViewport = viewport(device, width=width, height=height)
 
+    ip_address = subprocess.getoutput('hostname -I').strip()
+
     with canvas(device) as draw:
         nameSize = draw.textsize("UK Train Departure Display", fontBold)
         poweredSize = draw.textsize("Powered by", fontBold)
         NRESize = draw.textsize("National Rail Enquiries", fontBold)
-
+        IpAddressSize = draw.textsize("IP: http://%s" % ip_address, fontBold)
         rowOne = snapshot(width, 10, renderName((width - nameSize[0]) / 2), interval=10)
         rowThree = snapshot(width, 10, renderPoweredBy((width - poweredSize[0]) / 2), interval=10)
         rowFour = snapshot(width, 10, renderNRE((width - NRESize[0]) / 2), interval=10)
+        rowFive = snapshot(width, 10, renderIpAddress((width - IpAddressSize[0]) / 2, ip_address=ip_address), interval=10)
 
         if len(virtualViewport._hotspots) > 0:
             for hotspot, xy in virtualViewport._hotspots:
