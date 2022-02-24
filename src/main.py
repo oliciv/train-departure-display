@@ -186,7 +186,7 @@ def drawStartup(device, width, height):
         nameSize = draw.textsize("UK Train Departure Display", fontBold)
         poweredSize = draw.textsize("Powered by", fontBold)
         NRESize = draw.textsize("National Rail Enquiries", fontBold)
-        IpAddressSize = draw.textsize("IP: http://%s" % ip_address, fontBold)
+        IpAddressSize = draw.textsize("IP: %s" % ip_address, fontBold)
         rowOne = snapshot(width, 10, renderName((width - nameSize[0]) / 2), interval=10)
         rowThree = snapshot(width, 10, renderPoweredBy((width - poweredSize[0]) / 2), interval=10)
         rowFour = snapshot(width, 10, renderNRE((width - NRESize[0]) / 2), interval=10)
