@@ -199,6 +199,7 @@ def drawStartup(device, width, height):
         virtualViewport.add_hotspot(rowOne, (0, 0))
         virtualViewport.add_hotspot(rowThree, (0, 24))
         virtualViewport.add_hotspot(rowFour, (0, 36))
+        virtualViewport.add_hotspot(rowFive, (0, 50))
 
     return virtualViewport
 
