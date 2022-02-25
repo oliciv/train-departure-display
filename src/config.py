@@ -10,6 +10,7 @@ def loadConfig():
     data["screenRotation"] = int(os.getenv("screenRotation") or 2)
     data["screenBlankHours"] = os.getenv("screenBlankHours") or "1-6"
     data["dualScreen"] = bool(os.getenv("dualScreen") or False)
+    data["splashScreenTime"] = os.getenv("splashScreenTime") or "5"
 
     data["journey"]["departureStation"] = os.getenv("departureStation") or "PAD"
     data["journey"]["destinationStation"] = os.getenv("destinationStation") or ""

@@ -361,7 +361,7 @@ try:
     if config['dualScreen'] == True:
         virtual = drawStartup(device1, width=widgetWidth, height=widgetHeight)
         virtual.refresh()
-    time.sleep(5)
+    time.sleep(int(config["splashScreenTime"]))
 
     timeAtStart = time.time()-config["refreshTime"]
     timeNow = time.time()
