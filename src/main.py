@@ -116,6 +116,19 @@ def renderStatusText(xOffset, text):
 
     return drawText
 
+def displayError(device, width, height, text):
+    virtualViewport = viewport(device, width=width, height=height)
+
+    with canvas(device) as draw:
+        error_size = draw.textsize(text, fontBold)
+        rowOne = snapshot(width, 10, renderStatusText((width - error_size[0]) / 2, text), interval=10)
+        if len(virtualViewport._hotspots) > 0:
+            for hotspot, xy in virtualViewport._hotspots:
+                virtualViewport.remove_hotspot(hotspot, xy)
+
+        virtualViewport.add_hotspot(rowOne, (0, 0))
+
+    return virtualViewport
 
 def renderDepartureStation(departureStation, xOffset):
     def draw(draw, width, height):
