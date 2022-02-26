@@ -110,40 +110,12 @@ def renderTime(draw, width, height):
               font=fontBoldTall, fill="yellow")
 
 
-def renderWelcomeTo(xOffset):
+def renderStatusText(xOffset, text):
     def drawText(draw, width, height):
-        text = "Welcome to"
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return drawText
 
-def renderPoweredBy(xOffset):
-    def drawText(draw, width, height):
-        text = "Powered by"
-        draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
-
-    return drawText
-
-def renderNRE(xOffset):
-    def drawText(draw, width, height):
-        text = "National Rail Enquiries"
-        draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
-
-    return drawText
-
-def renderIpAddress(xOffset, ip_address):
-    def drawText(draw, width, height):
-        text = "IP: %s" % ip_address
-        draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
-
-    return drawText
-
-def renderName(xOffset):
-    def drawText(draw, width, height):
-        text = "UK Train Departure Display"
-        draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
-
-    return drawText
 
 def renderDepartureStation(departureStation, xOffset):
     def draw(draw, width, height):
@@ -187,10 +159,10 @@ def drawStartup(device, width, height):
         poweredSize = draw.textsize("Powered by", fontBold)
         NRESize = draw.textsize("National Rail Enquiries", fontBold)
         IpAddressSize = draw.textsize("IP: %s" % ip_address, fontBold)
-        rowOne = snapshot(width, 10, renderName((width - nameSize[0]) / 2), interval=10)
-        rowThree = snapshot(width, 10, renderPoweredBy((width - poweredSize[0]) / 2), interval=10)
-        rowFour = snapshot(width, 10, renderNRE((width - NRESize[0]) / 2), interval=10)
-        rowFive = snapshot(width, 10, renderIpAddress((width - IpAddressSize[0]) / 2, ip_address=ip_address), interval=10)
+        rowOne = snapshot(width, 10, renderStatusText((width - nameSize[0]) / 2, "UK Train Departure Display"), interval=10)
+        rowThree = snapshot(width, 10, renderStatusText((width - poweredSize[0]) / 2, text="Powered by"), interval=10)
+        rowFour = snapshot(width, 10, renderStatusText((width - NRESize[0]) / 2, text="National Rail Enquiries"), interval=10)
+        rowFive = snapshot(width, 10, renderStatusText((width - IpAddressSize[0]) / 2, text="IP: %s" % ip_address), interval=10)
 
         if len(virtualViewport._hotspots) > 0:
             for hotspot, xy in virtualViewport._hotspots:
@@ -216,8 +188,8 @@ def drawBlankSignage(device, width, height, departureStation):
 
     virtualViewport = viewport(device, width=width, height=height)
 
-    rowOne = snapshot(width, 10, renderWelcomeTo(
-        (width - welcomeSize[0]) / 2), interval=config["refreshTime"])
+    rowOne = snapshot(width, 10, renderStatusText(
+        (width - welcomeSize[0]) / 2, text="Welcome to"), interval=config["refreshTime"])
     rowTwo = snapshot(width, 10, renderDepartureStation(
         departureStation, (width - stationSize[0]) / 2), interval=config["refreshTime"])
     rowThree = snapshot(width, 10, renderDots, interval=config["refreshTime"])
