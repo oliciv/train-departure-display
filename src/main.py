@@ -348,6 +348,12 @@ try:
         virtual.refresh()
     time.sleep(int(config["splashScreenTime"]))
 
+    if not config["all_stations"].get(config["journey"]["departureStation"]):
+        virtual = displayError(device, width=widgetWidth, height=widgetHeight, text="Invalid station code: %s" % config["journey"]["departureStation"])
+        virtual.refresh()
+        while True:
+            time.sleep(1)
+
     timeAtStart = time.time()-config["refreshTime"]
     timeNow = time.time()
 

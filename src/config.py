@@ -20,6 +20,8 @@ def loadConfig():
         "api": {}
     }
 
+    data["all_stations"] = stations
+
     data["refreshTime"] = int(os.getenv("refreshTime") or 180)
     data["screenRotation"] = int(os.getenv("screenRotation") or 2)
     data["screenBlankHours"] = os.getenv("screenBlankHours") or "1-6"
