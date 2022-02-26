@@ -1,6 +1,20 @@
+import csv
 import os
 
 def loadConfig():
+
+    stations_path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            "data",
+            "stations.csv"
+        )
+    )
+
+    with open(stations_path, mode="r") as stations_file:
+        stations_reader = csv.reader(stations_file)
+        stations = {row[0]: row[1] for row in stations_reader}
+
     data = {
         "journey": {},
         "api": {}
@@ -14,7 +28,7 @@ def loadConfig():
 
     data["journey"]["departureStation"] = os.getenv("departureStation") or "PAD"
     data["journey"]["destinationStation"] = os.getenv("destinationStation") or ""
-    data["journey"]["outOfHoursName"] = os.getenv("outOfHoursName") or "London Paddington"
+    data["journey"]["outOfHoursName"] = os.getenv("outOfHoursName") or stations.get(data["journey"]["departureStation"], "London Paddington")
     data["journey"]["stationAbbr"] = { "International": "Intl." }
     data["journey"]['timeOffset'] = os.getenv("timeOffset") or "0"
     data["journey"]["screen1Platform"] = os.getenv("screen1Platform") or ""
