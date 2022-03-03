@@ -362,6 +362,9 @@ try:
     if not config["all_stations"].get(config["journey"]["departureStation"]):
         fatalError("Invalid station code: %s" % config["journey"]["departureStation"])
 
+    if not config["api"]["apiKey"]:
+        fatalError("Mising NRE API Key")
+
     timeAtStart = time.time()-config["refreshTime"]
     timeNow = time.time()
 
