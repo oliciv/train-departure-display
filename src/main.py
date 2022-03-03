@@ -119,14 +119,19 @@ def renderStatusText(xOffset, text):
 def displayError(device, width, height, text):
     virtualViewport = viewport(device, width=width, height=height)
 
+    ip_address = subprocess.getoutput('hostname -I').strip()
+
     with canvas(device) as draw:
         error_size = draw.textsize(text, fontBold)
+        IpAddressSize = draw.textsize("IP: %s" % ip_address, fontBold)
         rowOne = snapshot(width, 10, renderStatusText((width - error_size[0]) / 2, text), interval=10)
+        rowTwo = snapshot(width, 10, renderStatusText((width - IpAddressSize[0]) / 2, text="IP: %s" % ip_address), interval=10)
         if len(virtualViewport._hotspots) > 0:
             for hotspot, xy in virtualViewport._hotspots:
                 virtualViewport.remove_hotspot(hotspot, xy)
 
         virtualViewport.add_hotspot(rowOne, (0, 0))
+        virtualViewport.add_hotspot(rowTwo, (0, 36))
 
     return virtualViewport
 
