@@ -319,6 +319,12 @@ def drawSignage(device, width, height, data):
 
     return virtualViewport
 
+def fatalError(text):
+    virtual = displayError(device, width=widgetWidth, height=widgetHeight, text=text)
+    virtual.refresh()
+    while True:
+        time.sleep(1)
+
 
 try:
     version_file = open('VERSION', 'r')
