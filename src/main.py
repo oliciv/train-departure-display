@@ -19,6 +19,9 @@ from luma.oled.device import ssd1322
 from luma.core.virtual import viewport, snapshot, hotspot
 from luma.core.sprite_system import framerate_regulator
 
+num_departures = -1
+departures = []
+
 def makeFont(name, size):
     font_path = os.path.abspath(
         os.path.join(
@@ -30,19 +33,29 @@ def makeFont(name, size):
     return ImageFont.truetype(font_path, size)
 
 
-def renderDestination(departure, font):
-    departureTime = departure["aimed_departure_time"]
-    destinationName = departure["destination_name"]
-
+def renderDestination(departure_id, font):
     def drawText(draw, width, height):
+        try:
+            departure = departures[departure_id]
+        except IndexError:
+            return
+        departureTime = departure["aimed_departure_time"]
+        destinationName = departure["destination_name"]
         train = f"{departureTime}  {destinationName}"
         draw.text((0, 0), text=train, font=font, fill="yellow")
 
     return drawText
 
 
-def renderServiceStatus(departure):
+def renderServiceStatus(departure_id):
     def drawText(draw, width, height):
+
+        try:
+            departure = departures[departure_id]
+        except IndexError:
+            return
+
+        departure = departures[departure_id]
         train = ""
 
         if departure["expected_departure_time"] == "On time":
@@ -63,8 +76,15 @@ def renderServiceStatus(departure):
     return drawText
 
 
-def renderPlatform(departure):
+def renderPlatform(departure_id):
+    print("renderPlatform")
     def drawText(draw, width, height):
+        try:
+            departure = departures[departure_id]
+        except IndexError:
+            return
+        print("renderPlatform->drawText")
+        departure = departures[departure_id]
         if "platform" in departure:
             if (departure["platform"].lower() == "bus"):
                 draw.text((0, 0), text="BUS", font=font, fill="yellow")
@@ -78,9 +98,11 @@ def renderCallingAt(draw, width, height):
     draw.text((0, 0), text=stations, font=font, fill="yellow")
 
 
-def renderStations(stations):
+def renderStations():
     def drawText(draw, width, height):
         global stationRenderCount, pauseCount
+
+        stations = firstDepartureDestinations
 
         if(len(stations) == stationRenderCount - 5):
             stationRenderCount = 0
@@ -242,15 +264,27 @@ def platform_filter(departureData, platformNumber, nextStations, station):
 
     return platformData
 
-def drawSignage(device, width, height, data):
-    global stationRenderCount, pauseCount
+def drawSignage(device, width, height, data, virtualViewport=None):
+    global stationRenderCount, pauseCount, num_departures, departures, firstDepartureDestinations
 
-    virtualViewport = viewport(device, width=width, height=height)
+    if not virtualViewport:
+        print("!!! New viewport")
+        virtualViewport = viewport(device, width=width, height=height)
 
     status = "Exp 00:00"
     callingAt = "Calling at: "
 
     departures, firstDepartureDestinations, departureStation = data
+
+    import random
+    departures = departures[:random.randint(1, 3)]
+
+    if len(departures) == num_departures:
+        # We can reuse the existing hotpots with the new data and not redraw them
+        print("Reusing existing viwport")
+        return (virtualViewport, False)
+    print('new viewport')
+    num_departures = len(departures)
 
     with canvas(device) as draw:
         w, h = draw.textsize(callingAt, font)
@@ -268,27 +302,26 @@ def drawSignage(device, width, height, data):
         return noTrains
 
     rowOneA = snapshot(
-        width - w - pw - 5, 10, renderDestination(departures[0], fontBold), interval=config["refreshTime"])
+        width - w - pw - 5, 10, renderDestination(0, fontBold), interval=1)
     rowOneB = snapshot(w, 10, renderServiceStatus(
-        departures[0]), interval=10)
-    rowOneC = snapshot(pw, 10, renderPlatform(departures[0]), interval=config["refreshTime"])
-    rowTwoA = snapshot(callingWidth, 10, renderCallingAt, interval=config["refreshTime"])
+        0), interval=10)
+    rowOneC = snapshot(pw, 10, renderPlatform(0), interval=1)
+    rowTwoA = snapshot(callingWidth, 10, renderCallingAt, interval=1)
     rowTwoB = snapshot(width - callingWidth, 10,
-                       renderStations(firstDepartureDestinations), interval=0.1)
+                       renderStations(), interval=0.1)
 
     if(len(departures) > 1):
         rowThreeA = snapshot(width - w - pw, 10, renderDestination(
-            departures[1], font), interval=config["refreshTime"])
+            1, font), interval=config["refreshTime"])
         rowThreeB = snapshot(w, 10, renderServiceStatus(
-            departures[1]), interval=config["refreshTime"])
-        rowThreeC = snapshot(pw, 10, renderPlatform(departures[1]), interval=config["refreshTime"])
+            1), interval=config["refreshTime"])
+        rowThreeC = snapshot(pw, 10, renderPlatform(1), interval=1)
 
     if(len(departures) > 2):
-        rowFourA = snapshot(width - w - pw, 10, renderDestination(
-            departures[2], font), interval=10)
+        rowFourA = snapshot(width - w - pw, 10, renderDestination(2, font), interval=10)
         rowFourB = snapshot(w, 10, renderServiceStatus(
-            departures[2]), interval=10)
-        rowFourC = snapshot(pw, 10, renderPlatform(departures[2]), interval=config["refreshTime"])
+            2), interval=10)
+        rowFourC = snapshot(pw, 10, renderPlatform(2), interval=1)
 
     rowTime = hotspot(width, 14, renderTime)
 
@@ -317,7 +350,7 @@ def drawSignage(device, width, height, data):
 
     virtualViewport.add_hotspot(rowTime, (0, 50))
 
-    return virtualViewport
+    return (virtualViewport, True)
 
 def fatalError(text):
     virtual = displayError(device, width=widgetWidth, height=widgetHeight, text=text)
@@ -370,6 +403,7 @@ try:
 
     blankHours = [int(x) for x in config['screenBlankHours'].split('-')]
 
+    virtual = None
     while True:
         with regulator:
             if isRun(blankHours[0], blankHours[1]) == True:
@@ -393,8 +427,10 @@ try:
                         nextStations = data[1]
                         station = data[2]
                         screenData = platform_filter(departureData, config["journey"]["screen1Platform"], nextStations, station)
-                        virtual = drawSignage(device, width=widgetWidth,height=widgetHeight, data=screenData)
-                        
+                        print("about to draw signag")
+                        # time.sleep(5)
+                        virtual, changed = drawSignage(device, width=widgetWidth,height=widgetHeight, data=screenData, virtualViewport=virtual)
+                        print('drew signage')
                         if config['dualScreen'] == True:
                             screen1Data = platform_filter(departureData, config["journey"]["screen2Platform"], nextStations, station)
                             virtual1 = drawSignage(device1, width=widgetWidth,height=widgetHeight, data=screen1Data)
@@ -402,6 +438,7 @@ try:
                     timeAtStart = time.time()
 
                 timeNow = time.time()
+                
                 virtual.refresh()
                 if config['dualScreen'] == True:
                     virtual1.refresh()
