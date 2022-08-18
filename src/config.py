@@ -39,5 +39,7 @@ def loadConfig():
     data["api"]["apiKey"] = os.getenv("apiKey") or None
     data["api"]["operatingHours"] = os.getenv("operatingHours") or "8-22"
 
+    data["api"]["logDir"] = os.getenv("logDir") or None
+
     return data
     

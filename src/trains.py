@@ -1,9 +1,14 @@
-import os
-import requests
 import json
-import sys
+import os
 import re
+import sys
+import time
+
+import requests
 import xmltodict
+
+from config import loadConfig
+
 
 def removeBrackets(originalName):
     return re.split(r" \(",originalName)[0]
@@ -171,6 +176,13 @@ def loadDeparturesForStation(config, rows, log_dir=None):
     apiURL = "https://lite.realtime.nationalrail.co.uk/OpenLDBWS/ldb11.asmx"
 
     APIOut = requests.post(apiURL, data=APIRequest, headers=headers).text
+
+    if apiConfig["logDir"]:
+        log_file_name = str(int(time.time())) + ".log"
+        log_path = os.path.join(apiConfig["logDir"], journeyConfig["departureStation"])
+        os.makedirs(log_path)
+        with open(os.path.join(log_path, log_file_name), "w") as logFile:
+            logFile.write(APIOut)
 
     Departures, departureStationName = ProcessDepartures(APIOut)
 
