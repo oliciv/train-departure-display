@@ -22,6 +22,9 @@ from luma.core.sprite_system import framerate_regulator
 num_departures = -1
 departures = []
 
+messageRenderCount = 0
+pauseCount = 0
+
 def makeFont(name, size):
     font_path = os.path.abspath(
         os.path.join(
@@ -165,10 +168,28 @@ def renderDepartureStation(departureStation, xOffset):
     return draw
 
 
-def renderDots(draw, width, height):
-    text = ".  .  ."
-    draw.text((0, 0), text=text, font=fontBold, fill="yellow")
+def renderMessages(messages, xOffset):
+    print(messages)
+    def draw(draw, width, height):
+        global messageRenderCount, pauseCount
+        if len(messages) > 0:
+            text = messages[0]
+        else:
+            text = ".  .  .".rjust(140)
 
+        if(len(text) == messageRenderCount - 5):
+            messageRenderCount = 0
+
+        draw.text((0, 0), text=text[messageRenderCount:], width=width, font=font, fill="yellow")
+
+        if messageRenderCount == 0 and pauseCount < 8:
+            pauseCount += 1
+            messageRenderCount = 0
+        else:
+            pauseCount = 0
+            messageRenderCount += 1
+
+    return draw
 
 def loadData(config):
 
@@ -177,21 +198,20 @@ def loadData(config):
 
     runHours = [int(x) for x in apiConfig['operatingHours'].split('-')]
     if isRun(runHours[0], runHours[1]) == False:
-        return False, False, journeyConfig['outOfHoursName']
+        return False, False, journeyConfig['outOfHoursName'], []
 
     if config['dualScreen'] == True:
         rows = "6"
     else:
         rows = "3"
 
-    departures, stationName = loadDeparturesForStation(
-        journeyConfig, apiConfig["apiKey"], rows)
+    departures, messages, stationName = loadDeparturesForStation(config, rows)
 
     if (departures == None):
-        return False, False, stationName
+        return False, False, stationName, messages
 
     firstDepartureDestinations = departures[0]["calling_at_list"]
-    return departures, firstDepartureDestinations, stationName
+    return departures, firstDepartureDestinations, stationName, []
 
 def drawStartup(device, width, height):
     virtualViewport = viewport(device, width=width, height=height)
@@ -219,7 +239,7 @@ def drawStartup(device, width, height):
 
     return virtualViewport
 
-def drawBlankSignage(device, width, height, departureStation):
+def drawBlankSignage(device, width, height, departureStation, messages):
     global stationRenderCount, pauseCount
 
     with canvas(device) as draw:
@@ -236,7 +256,7 @@ def drawBlankSignage(device, width, height, departureStation):
         (width - welcomeSize[0]) / 2, text="Welcome to"), interval=config["refreshTime"])
     rowTwo = snapshot(width, 10, renderDepartureStation(
         departureStation, (width - stationSize[0]) / 2), interval=config["refreshTime"])
-    rowThree = snapshot(width, 10, renderDots, interval=config["refreshTime"])
+    rowThree = snapshot(width, 10, renderMessages(messages, 0), interval=0.1)
     rowTime = hotspot(width, 14, renderTime)
 
     if len(virtualViewport._hotspots) > 0:
@@ -245,7 +265,7 @@ def drawBlankSignage(device, width, height, departureStation):
 
     virtualViewport.add_hotspot(rowOne, (0, 0))
     virtualViewport.add_hotspot(rowTwo, (0, 12))
-    virtualViewport.add_hotspot(rowThree, (0, 24))
+    virtualViewport.add_hotspot(rowThree, (0, 30))
     virtualViewport.add_hotspot(rowTime, (0, 50))
 
     return virtualViewport
@@ -419,13 +439,13 @@ try:
                 if(timeNow - timeAtStart >= config["refreshTime"]):
 
                     print('Effective FPS: ' + str(round(regulator.effective_FPS(),2)))
-                    data = loadData(config["api"], config["journey"], config)
+                    data = loadData(config)
                     if data[0] == False:
                         virtual = drawBlankSignage(
-                            device, width=widgetWidth, height=widgetHeight, departureStation=data[2])
+                            device, width=widgetWidth, height=widgetHeight, departureStation=data[2], messages=data[3])
                         if config['dualScreen'] == True:
                             virtual1 = drawBlankSignage(
-                                device1, width=widgetWidth, height=widgetHeight, departureStation=data[2])
+                                device1, width=widgetWidth, height=widgetHeight, departureStation=data[2], messages=data[3])
                     else:
                         departureData = data[0]
                         nextStations = data[1]

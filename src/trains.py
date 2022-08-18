@@ -30,6 +30,15 @@ def ArrivalOrder(ServicesIN):
     ServicesOUT = sorted(ServicesOUT, key=lambda k: k['sortOrder'])
     return ServicesOUT
 
+def ProcessMessages(APIOut):
+    APIElements = xmltodict.parse(APIOut)
+    messages = APIElements['soap:Envelope']['soap:Body']['GetDepBoardWithDetailsResponse']['GetStationBoardResult'].get("lt4:nrccMessages", [])
+    if isinstance(messages,dict):
+        messages = [messages]
+
+    return[re.sub('<[^<]+?>', '', message.get("lt:message")) for message in messages]
+
+
 def ProcessDepartures(APIOut):
     APIElements = xmltodict.parse(APIOut)
     Services = []
@@ -186,4 +195,6 @@ def loadDeparturesForStation(config, rows, log_dir=None):
 
     Departures, departureStationName = ProcessDepartures(APIOut)
 
-    return Departures, departureStationName
+    Messages = ProcessMessages(APIOut)
+
+    return Departures, Messages, departureStationName
