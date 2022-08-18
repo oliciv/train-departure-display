@@ -180,7 +180,7 @@ def loadDeparturesForStation(config, rows, log_dir=None):
     if apiConfig["logDir"]:
         log_file_name = str(int(time.time())) + ".log"
         log_path = os.path.join(apiConfig["logDir"], journeyConfig["departureStation"])
-        os.makedirs(log_path)
+        os.makedirs(log_path, exist_ok=True)
         with open(os.path.join(log_path, log_file_name), "w") as logFile:
             logFile.write(APIOut)
 
