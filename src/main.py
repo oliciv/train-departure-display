@@ -170,7 +170,11 @@ def renderDots(draw, width, height):
     draw.text((0, 0), text=text, font=fontBold, fill="yellow")
 
 
-def loadData(apiConfig, journeyConfig, config):
+def loadData(config):
+
+    apiConfig = config["api"]
+    journeyConfig = config["journey"]
+
     runHours = [int(x) for x in apiConfig['operatingHours'].split('-')]
     if isRun(runHours[0], runHours[1]) == False:
         return False, False, journeyConfig['outOfHoursName']

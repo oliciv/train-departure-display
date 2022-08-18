@@ -136,19 +136,23 @@ def ProcessDepartures(APIOut):
 
     return Departures, departureStationName
 
-def loadDeparturesForStation(journeyConfig, apiKey, rows):
+def loadDeparturesForStation(config, rows, log_dir=None):
+
+    journeyConfig = config["journey"]
+    apiConfig = config["api"]
+
     if journeyConfig["departureStation"] == "":
         raise ValueError(
             "Please configure the departureStation environment variable")
 
-    if apiKey == None:
+    if apiConfig["apiKey"] == None:
         raise ValueError(
             "Please configure the apiKey environment variable")
 
     APIRequest = """
         <x:Envelope xmlns:x="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ldb="http://thalesgroup.com/RTTI/2017-10-01/ldb/" xmlns:typ4="http://thalesgroup.com/RTTI/2013-11-28/Token/types">
         <x:Header>
-            <typ4:AccessToken><typ4:TokenValue>""" + apiKey + """</typ4:TokenValue></typ4:AccessToken>
+            <typ4:AccessToken><typ4:TokenValue>""" + apiConfig["apiKey"] + """</typ4:TokenValue></typ4:AccessToken>
         </x:Header>
         <x:Body>
             <ldb:GetDepBoardWithDetailsRequest>
