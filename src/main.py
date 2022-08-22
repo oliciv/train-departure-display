@@ -8,6 +8,7 @@ from datetime import timedelta
 from timeloop import Timeloop
 from datetime import datetime
 from PIL import ImageFont, Image
+import requests
 
 from trains import loadDeparturesForStation
 from config import loadConfig
@@ -205,7 +206,10 @@ def loadData(config):
     else:
         rows = "3"
 
-    departures, messages, stationName = loadDeparturesForStation(config, rows)
+    try:
+        departures, messages, stationName = loadDeparturesForStation(config, rows)
+    except requests.exceptions.RequestException as e:
+        return False, False, journeyConfig['outOfHoursName'], ["Unable to connect to LDB API - {}".format(e)]
 
     if (departures == None):
         return False, False, stationName, messages
