@@ -170,13 +170,14 @@ def renderDepartureStation(departureStation, xOffset):
 
 
 def renderMessages(messages, xOffset):
-    print(messages)
     def draw(draw, width, height):
         global messageRenderCount, pauseCount
         if len(messages) > 0:
             text = messages[0]
         else:
-            text = ".  .  .".rjust(140)
+            text = ".  .  ."
+
+        text = text.rjust(160)
 
         if(len(text) == messageRenderCount - 5):
             messageRenderCount = 0
