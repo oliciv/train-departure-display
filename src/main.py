@@ -211,6 +211,8 @@ def loadData(config):
         departures, messages, stationName = loadDeparturesForStation(config, rows)
     except requests.exceptions.RequestException as e:
         return False, False, journeyConfig['outOfHoursName'], ["Unable to connect to LDB API - {}".format(e)]
+    except KeyError:
+        return False, False, journeyConfig['outOfHoursName'], ["Unexpected response from LDB API"]
 
     if (departures == None):
         return False, False, stationName, messages
