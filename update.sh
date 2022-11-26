@@ -8,3 +8,5 @@ NEW_HEAD=$(git rev-parse HEAD)
 
 echo "Changed"
 
+sudo service departure restart
+
