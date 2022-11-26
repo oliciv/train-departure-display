@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+export apiKey=abc-123-abc-123
+export departureStation=TRO
+export screenRotation=0
+export operatingHours=8-23
+export refreshTime=60
+export logDir=/home/pi/logs/
+./src/main.py --display ssd1322 --width 256 --height 64 --interface spi
