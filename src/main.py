@@ -307,8 +307,8 @@ def drawSignage(device, width, height, data, virtualViewport=None):
 
     departures, firstDepartureDestinations, departureStation = data
 
-    import random
-    departures = departures[:random.randint(1, 3)]
+    # import random
+    # departures = departures[:random.randint(1, 3)]
 
     if len(departures) == num_departures:
         # We can reuse the existing hotpots with the new data and not redraw them
