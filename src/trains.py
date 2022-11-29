@@ -36,7 +36,11 @@ def ProcessMessages(APIOut):
     if isinstance(messages,dict):
         messages = [messages]
 
-    return[re.sub('<[^<]+?>', '', message.get("lt:message")) for message in messages]
+    messages = [message.get("lt:message") for message in messages]
+
+    messages = [" ".join(message) if isinstance(message, list) else message for message in messages]
+
+    return[re.sub('<[^<]+?>', '', message) for message in messages]
 
 
 def ProcessDepartures(APIOut):
