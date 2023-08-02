@@ -371,6 +371,8 @@ def drawSignage(device, width, height, data, virtualViewport=None):
         for vhotspot, xy in virtualViewport._hotspots:
             virtualViewport.remove_hotspot(vhotspot, xy)
 
+    device.clear()
+
     stationRenderCount = 0
     pauseCount = 0
 
