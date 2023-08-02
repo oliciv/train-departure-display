@@ -326,8 +326,8 @@ def drawSignage(device, width, height, data, virtualViewport=None):
         pw, ph = draw.textsize("Plat 88", font)
 
     if(len(departures) == 0):
-        noTrains = drawBlankSignage(device, width=width, height=height, departureStation=departureStation)
-        return noTrains
+        noTrains = drawBlankSignage(device, width=width, height=height, departureStation=departureStation, messages=[], virtualViewport=virtualViewport)
+        return (noTrains, True)
 
     rowOneA = snapshot(
         width - w - pw - 5, 10, renderDestination(0, fontBold), interval=1)
