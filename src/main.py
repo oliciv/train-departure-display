@@ -220,17 +220,17 @@ def loadData(config):
     firstDepartureDestinations = departures[0]["calling_at_list"]
     return departures, firstDepartureDestinations, stationName, []
 
-def drawStartup(device, width, height):
+def drawStartup(device, width, height, mainTitle):
     virtualViewport = viewport(device, width=width, height=height)
 
     ip_address = subprocess.getoutput('hostname -I').strip()
 
     with canvas(device) as draw:
-        nameSize = draw.textsize("UK Train Departure Display", fontBold)
+        nameSize = draw.textsize(mainTitle, fontBold)
         poweredSize = draw.textsize("Powered by", fontBold)
         NRESize = draw.textsize("National Rail Enquiries", fontBold)
         IpAddressSize = draw.textsize("IP: %s" % ip_address, fontBold)
-        rowOne = snapshot(width, 10, renderStatusText((width - nameSize[0]) / 2, "UK Train Departure Display"), interval=10)
+        rowOne = snapshot(width, 10, renderStatusText((width - nameSize[0]) / 2, mainTitle), interval=10)
         rowThree = snapshot(width, 10, renderStatusText((width - poweredSize[0]) / 2, text="Powered by"), interval=10)
         rowFour = snapshot(width, 10, renderStatusText((width - NRESize[0]) / 2, text="National Rail Enquiries"), interval=10)
         rowFive = snapshot(width, 10, renderStatusText((width - IpAddressSize[0]) / 2, text="IP: %s" % ip_address), interval=10)
@@ -413,7 +413,7 @@ try:
     regulator = framerate_regulator(20)
 
     # display NRE attribution while data loads
-    virtual = drawStartup(device, width=widgetWidth, height=widgetHeight)
+    virtual = drawStartup(device, width=widgetWidth, height=widgetHeight, mainTitle=config["mainTitle"])
     virtual.refresh()
     if config['dualScreen'] == True:
         virtual = drawStartup(device1, width=widgetWidth, height=widgetHeight)

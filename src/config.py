@@ -22,6 +22,7 @@ def loadConfig():
 
     data["all_stations"] = stations
 
+    data["mainTitle"] = os.getenv("mainTitle") or "UK Train Departure Display"
     data["refreshTime"] = int(os.getenv("refreshTime") or 180)
     data["screenRotation"] = int(os.getenv("screenRotation") or 2)
     data["screenBlankHours"] = os.getenv("screenBlankHours") or "1-6"
