@@ -26,6 +26,8 @@ departures = []
 messageRenderCount = 0
 pauseCount = 0
 
+currentlyRendered = ()
+
 def makeFont(name, size):
     font_path = os.path.abspath(
         os.path.join(
@@ -246,8 +248,16 @@ def drawStartup(device, width, height, mainTitle):
 
     return virtualViewport
 
-def drawBlankSignage(device, width, height, departureStation, messages):
-    global stationRenderCount, pauseCount
+def drawBlankSignage(device, width, height, departureStation, messages, virtualViewport=None):
+    global stationRenderCount, pauseCount, currentlyRendered
+
+    print("BLANK SIGNAGE")
+
+    blankInfo = (departureStation, messages)
+    if blankInfo == currentlyRendered:
+        return virtualViewport
+
+    currentlyRendered = blankInfo
 
     with canvas(device) as draw:
         welcomeSize = draw.textsize("Welcome to", fontBold)
@@ -296,7 +306,7 @@ def platform_filter(departureData, platformNumber, nextStations, station):
     return platformData
 
 def drawSignage(device, width, height, data, virtualViewport=None):
-    global stationRenderCount, pauseCount, num_departures, departures, firstDepartureDestinations
+    global stationRenderCount, pauseCount, num_departures, departures, firstDepartureDestinations, currentlyRendered
 
     if not virtualViewport:
         print("!!! New viewport")
@@ -325,9 +335,13 @@ def drawSignage(device, width, height, data, virtualViewport=None):
         w, h = draw.textsize(status, font)
         pw, ph = draw.textsize("Plat 88", font)
 
+    print("DEAPRTURES?", departures)
+
     if(len(departures) == 0):
         noTrains = drawBlankSignage(device, width=width, height=height, departureStation=departureStation, messages=[], virtualViewport=virtualViewport)
         return (noTrains, True)
+
+    currentlyRendered = departures
 
     rowOneA = snapshot(
         width - w - pw - 5, 10, renderDestination(0, fontBold), interval=1)
@@ -446,10 +460,10 @@ try:
                     data = loadData(config)
                     if data[0] == False:
                         virtual = drawBlankSignage(
-                            device, width=widgetWidth, height=widgetHeight, departureStation=data[2], messages=data[3])
+                            device, width=widgetWidth, height=widgetHeight, departureStation=data[2], messages=data[3], virtualViewport=virtual)
                         if config['dualScreen'] == True:
                             virtual1 = drawBlankSignage(
-                                device1, width=widgetWidth, height=widgetHeight, departureStation=data[2], messages=data[3])
+                                device1, width=widgetWidth, height=widgetHeight, departureStation=data[2], messages=data[3], virtualViewport=virtual1)
                     else:
                         departureData = data[0]
                         nextStations = data[1]
