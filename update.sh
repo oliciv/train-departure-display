@@ -1,5 +1,6 @@
 #!/bin/bash
 
+CURRENT_BRANCH=$(git branch --show-current)
 OLD_HEAD=$(git rev-parse HEAD)
 git fetch --all
 git reset --hard origin/$CURRENT_BRANCH
