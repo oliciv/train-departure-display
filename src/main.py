@@ -461,6 +461,7 @@ try:
                     print('Effective FPS: ' + str(round(regulator.effective_FPS(),2)))
                     data = loadData(config)
                     if data[0] == False:
+                        num_departures = -1 # will force the screen to rerender once it stops being blank and departures need to be displayed again
                         virtual = drawBlankSignage(
                             device, width=widgetWidth, height=widgetHeight, departureStation=data[2], messages=data[3], virtualViewport=virtual)
                         if config['dualScreen'] == True:
