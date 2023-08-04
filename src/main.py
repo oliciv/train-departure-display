@@ -227,15 +227,19 @@ def drawStartup(device, width, height, mainTitle):
 
     ip_address = subprocess.getoutput('hostname -I').strip()
 
+    revision = subprocess.getoutput('git rev-parse --short HEAD').strip()
+
+    debugText = "IP: %s / Rev: %s" % (ip_address, revision)
+
     with canvas(device) as draw:
         nameSize = draw.textbbox((0,0), mainTitle, fontBold)
         poweredSize = draw.textbbox((0,0), "Powered by", fontBold)
         NRESize = draw.textbbox((0,0), "National Rail Enquiries", fontBold)
-        IpAddressSize = draw.textbbox((0,0), "IP: %s" % ip_address, fontBold)
+        IpAddressSize = draw.textbbox((0,0), debugText, fontBold)
         rowOne = snapshot(width, 10, renderStatusText((width - nameSize[2]) / 2, mainTitle), interval=10)
         rowThree = snapshot(width, 10, renderStatusText((width - poweredSize[2]) / 2, text="Powered by"), interval=10)
         rowFour = snapshot(width, 10, renderStatusText((width - NRESize[2]) / 2, text="National Rail Enquiries"), interval=10)
-        rowFive = snapshot(width, 10, renderStatusText((width - IpAddressSize[2]) / 2, text="IP: %s" % ip_address), interval=10)
+        rowFive = snapshot(width, 10, renderStatusText((width - IpAddressSize[2]) / 2, text=debugText), interval=10)
 
         if len(virtualViewport._hotspots) > 0:
             for hotspot, xy in virtualViewport._hotspots:
