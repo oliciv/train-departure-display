@@ -77,7 +77,7 @@ def renderServiceStatus(departure_id):
             if departure["aimed_departure_time"] == departure["expected_departure_time"]:
                 train = "On time"
 
-        w, h = draw.textsize(train, font)
+        _x, _y, w, h = draw.textbbox((0, 0), train, font)
         draw.text((width-w,0), text=train, font=font, fill="yellow")
     return drawText
 
@@ -129,8 +129,8 @@ def renderTime(draw, width, height):
     rawTime = datetime.now().time()
     hour, minute, second = str(rawTime).split('.')[0].split(':')
 
-    w1, h1 = draw.textsize("{}:{}".format(hour, minute), fontBoldLarge)
-    w2, h2 = draw.textsize(":00", fontBoldTall)
+    _x, _y, w1, h1 = draw.textbbox((0,0), "{}:{}".format(hour, minute), fontBoldLarge)
+    _x, _y, w2, h2 = draw.textbbox((0,0), ":00", fontBoldTall)
 
     draw.text(((width - w1 - w2) / 2, 0), text="{}:{}".format(hour, minute),
               font=fontBoldLarge, fill="yellow")
@@ -150,10 +150,10 @@ def displayError(device, width, height, text):
     ip_address = subprocess.getoutput('hostname -I').strip()
 
     with canvas(device) as draw:
-        error_size = draw.textsize(text, fontBold)
-        IpAddressSize = draw.textsize("IP: %s" % ip_address, fontBold)
-        rowOne = snapshot(width, 10, renderStatusText((width - error_size[0]) / 2, text), interval=10)
-        rowTwo = snapshot(width, 10, renderStatusText((width - IpAddressSize[0]) / 2, text="IP: %s" % ip_address), interval=10)
+        error_size = draw.textbbox(text, fontBold)
+        IpAddressSize = draw.textbbox("IP: %s" % ip_address, fontBold)
+        rowOne = snapshot(width, 10, renderStatusText((width - error_size[2]) / 2, text), interval=10)
+        rowTwo = snapshot(width, 10, renderStatusText((width - IpAddressSize[2]) / 2, text="IP: %s" % ip_address), interval=10)
         if len(virtualViewport._hotspots) > 0:
             for hotspot, xy in virtualViewport._hotspots:
                 virtualViewport.remove_hotspot(hotspot, xy)
@@ -228,14 +228,14 @@ def drawStartup(device, width, height, mainTitle):
     ip_address = subprocess.getoutput('hostname -I').strip()
 
     with canvas(device) as draw:
-        nameSize = draw.textsize(mainTitle, fontBold)
-        poweredSize = draw.textsize("Powered by", fontBold)
-        NRESize = draw.textsize("National Rail Enquiries", fontBold)
-        IpAddressSize = draw.textsize("IP: %s" % ip_address, fontBold)
-        rowOne = snapshot(width, 10, renderStatusText((width - nameSize[0]) / 2, mainTitle), interval=10)
-        rowThree = snapshot(width, 10, renderStatusText((width - poweredSize[0]) / 2, text="Powered by"), interval=10)
-        rowFour = snapshot(width, 10, renderStatusText((width - NRESize[0]) / 2, text="National Rail Enquiries"), interval=10)
-        rowFive = snapshot(width, 10, renderStatusText((width - IpAddressSize[0]) / 2, text="IP: %s" % ip_address), interval=10)
+        nameSize = draw.textbbox(mainTitle, fontBold)
+        poweredSize = draw.textbbox("Powered by", fontBold)
+        NRESize = draw.textbbox("National Rail Enquiries", fontBold)
+        IpAddressSize = draw.textbbox("IP: %s" % ip_address, fontBold)
+        rowOne = snapshot(width, 10, renderStatusText((width - nameSize[2]) / 2, mainTitle), interval=10)
+        rowThree = snapshot(width, 10, renderStatusText((width - poweredSize[2]) / 2, text="Powered by"), interval=10)
+        rowFour = snapshot(width, 10, renderStatusText((width - NRESize[2]) / 2, text="National Rail Enquiries"), interval=10)
+        rowFive = snapshot(width, 10, renderStatusText((width - IpAddressSize[2]) / 2, text="IP: %s" % ip_address), interval=10)
 
         if len(virtualViewport._hotspots) > 0:
             for hotspot, xy in virtualViewport._hotspots:
@@ -260,19 +260,19 @@ def drawBlankSignage(device, width, height, departureStation, messages, virtualV
     currentlyRendered = blankInfo
 
     with canvas(device) as draw:
-        welcomeSize = draw.textsize("Welcome to", fontBold)
+        welcomeSize = draw.textbbox("Welcome to", fontBold)
 
     with canvas(device) as draw:
-        stationSize = draw.textsize(departureStation, fontBold)
+        stationSize = draw.textbbox(departureStation, fontBold)
 
     device.clear()
 
     virtualViewport = viewport(device, width=width, height=height)
 
     rowOne = snapshot(width, 10, renderStatusText(
-        (width - welcomeSize[0]) / 2, text="Welcome to"), interval=config["refreshTime"])
+        (width - welcomeSize[2]) / 2, text="Welcome to"), interval=config["refreshTime"])
     rowTwo = snapshot(width, 10, renderDepartureStation(
-        departureStation, (width - stationSize[0]) / 2), interval=config["refreshTime"])
+        departureStation, (width - stationSize[2]) / 2), interval=config["refreshTime"])
     rowThree = snapshot(width, 10, renderMessages(messages, 0), interval=0.1)
     rowTime = hotspot(width, 14, renderTime)
 
@@ -325,15 +325,15 @@ def drawSignage(device, width, height, data, virtualViewport=None):
     num_departures = len(departures)
 
     with canvas(device) as draw:
-        w, h = draw.textsize(callingAt, font)
+        _x, _y, w, h = draw.textbbox(callingAt, font)
 
     callingWidth = w
     width = virtualViewport.width
 
     # First measure the text size
     with canvas(device) as draw:
-        w, h = draw.textsize(status, font)
-        pw, ph = draw.textsize("Plat 88", font)
+        _x, _y, w, h = draw.textbbox(status, font)
+        _x, _y, pw, ph = draw.textbbox("Plat 88", font)
 
     print("DEAPRTURES?", departures)
 
