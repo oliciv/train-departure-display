@@ -110,7 +110,7 @@ def renderStations():
 
         stations = firstDepartureDestinations
 
-        if(len(stations) == stationRenderCount - 5):
+        if(len(stations) <= stationRenderCount - 5):
             stationRenderCount = 0
 
         draw.text(
