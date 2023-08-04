@@ -177,7 +177,7 @@ def renderMessages(messages, xOffset):
         if len(messages) > 0:
             text = messages[0]
         else:
-            text = ".  .  ."
+            return
 
         text = text.rjust(160)
 
