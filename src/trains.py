@@ -94,6 +94,11 @@ def ProcessDepartures(APIOut):
         # get estimated departure time
         thisDeparture["expected_departure_time"] = eachService["lt4:etd"]
 
+        if 'lt4:cancelReason' in eachService:
+            thisDeparture["cancel_reason"] = eachService["lt4:cancelReason"]
+        else:
+            thisDeparture["cancel_reason"] = None
+
         # get carriages, if available
         num_coaches = None
         if 'lt4:length' in eachService:

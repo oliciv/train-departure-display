@@ -219,7 +219,10 @@ def loadData(config):
     if (departures == None):
         return False, False, stationName, messages
 
-    firstDepartureDestinations = departures[0]["calling_at_list"]
+    if departures[0]["cancel_reason"]:
+        firstDepartureDestinations = departures[0]["cancel_reason"]
+    else:
+        firstDepartureDestinations = departures[0]["calling_at_list"]
     return departures, firstDepartureDestinations, stationName, []
 
 def drawStartup(device, width, height, mainTitle):
