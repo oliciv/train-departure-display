@@ -223,6 +223,10 @@ def loadData(config):
         firstDepartureDestinations = departures[0]["cancel_reason"]
     else:
         firstDepartureDestinations = departures[0]["calling_at_list"]
+
+    if departures[0]["delay_reason"]
+        firstDepartureDestinations = "{} {}".format(firstDepartureDestinations, departures[0]["delay_reason"])
+
     return departures, firstDepartureDestinations, stationName, []
 
 def drawStartup(device, width, height, mainTitle):

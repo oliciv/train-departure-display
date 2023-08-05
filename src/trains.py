@@ -99,6 +99,11 @@ def ProcessDepartures(APIOut):
         else:
             thisDeparture["cancel_reason"] = None
 
+        if 'lt4:delayReason' in eachService:
+            thisDeparture["delay_reason"] = eachService["lt4:delayReason"]
+        else:
+            thisDeparture["delay_reason"] = None
+
         # get carriages, if available
         num_coaches = None
         if 'lt4:length' in eachService:
