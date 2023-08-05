@@ -95,8 +95,14 @@ def ProcessDepartures(APIOut):
         thisDeparture["expected_departure_time"] = eachService["lt4:etd"]
 
         # get carriages, if available
+        num_coaches = None
         if 'lt4:length' in eachService:
-            thisDeparture["carriages"] = " formed of "+eachService["lt4:length"]+" coaches."
+            num_coaches = eachService["lt4:length"]
+        elif 'lt7:formation' in eachService:
+            num_coaches = eachService["lt7:coaches"]["lt7:coaches"]
+
+        if num_coaches:
+            thisDeparture["carriages"] = " formed of " + num_coaches + " coaches."
         else:
             thisDeparture["carriages"] = ""
 
