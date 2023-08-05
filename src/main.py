@@ -224,7 +224,7 @@ def loadData(config):
     else:
         firstDepartureDestinations = departures[0]["calling_at_list"]
 
-    if departures[0]["delay_reason"]
+    if departures[0]["delay_reason"]:
         firstDepartureDestinations = "{} {}".format(firstDepartureDestinations, departures[0]["delay_reason"])
 
     return departures, firstDepartureDestinations, stationName, []
