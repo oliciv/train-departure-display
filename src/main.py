@@ -219,13 +219,7 @@ def loadData(config):
     if (departures == None):
         return False, False, stationName, messages
 
-    if departures[0]["cancel_reason"]:
-        firstDepartureDestinations = departures[0]["cancel_reason"]
-    else:
-        firstDepartureDestinations = departures[0]["calling_at_list"]
-
-    if departures[0]["delay_reason"]:
-        firstDepartureDestinations = "{} {}".format(firstDepartureDestinations, departures[0]["delay_reason"])
+    firstDepartureDestinations = departures[0]["calling_at_list"]
 
     return departures, firstDepartureDestinations, stationName, []
 
@@ -310,6 +304,14 @@ def platform_filter(departureData, platformNumber, nextStations, station):
 
     if (len(platformDepartures) > 0):
         firstDepartureDestinations = platformDepartures[0]["calling_at_list"]
+
+        if platformDepartures[0]["cancel_reason"]:
+            firstDepartureDestinations = platformDepartures[0]["cancel_reason"]
+        elif platformDepartures[0]["delay_reason"]:
+            firstDepartureDestinations = "{}.   --   {}".format(firstDepartureDestinations, platformDepartures[0]["delay_reason"])
+        else:
+            firstDepartureDestinations = platformDepartures[0]["calling_at_list"]
+
         platformData = platformDepartures, firstDepartureDestinations, station
     else:
         platformData = platformDepartures, "", station
