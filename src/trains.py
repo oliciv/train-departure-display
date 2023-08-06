@@ -109,7 +109,7 @@ def ProcessDepartures(APIOut):
         if 'lt4:length' in eachService:
             num_coaches = eachService["lt4:length"]
         elif 'lt7:formation' in eachService:
-            num_coaches = eachService["lt7:coaches"]["lt7:coaches"]
+            num_coaches = eachService["lt7:formation"]["lt7:coaches"]
 
         if num_coaches:
             thisDeparture["carriages"] = " formed of " + num_coaches + " coaches."
