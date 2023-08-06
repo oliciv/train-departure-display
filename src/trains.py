@@ -94,7 +94,8 @@ def ProcessDepartures(APIOut):
         # get estimated departure time
         thisDeparture["expected_departure_time"] = eachService["lt4:etd"]
 
-        if 'lt4:cancelReason' in eachService:
+        if eachService.get("lt4:isCancelled") == "true" and 'lt4:cancelReason' in eachService:
+            # Cancel messages can exist even if a train isn't actually cancelled yet, so don't include them until it is
             thisDeparture["cancel_reason"] = eachService["lt4:cancelReason"]
         else:
             thisDeparture["cancel_reason"] = None
