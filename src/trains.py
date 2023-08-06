@@ -112,7 +112,7 @@ def ProcessDepartures(APIOut):
             num_coaches = len(eachService["lt7:formation"]["lt7:coaches"])
 
         if num_coaches:
-            thisDeparture["carriages"] = " formed of " + num_coaches + " coaches."
+            thisDeparture["carriages"] = " formed of {} coaches.".format(num_coaches)
         else:
             thisDeparture["carriages"] = ""
 
