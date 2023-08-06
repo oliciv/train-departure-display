@@ -83,13 +83,11 @@ def renderServiceStatus(departure_id):
 
 
 def renderPlatform(departure_id):
-    print("renderPlatform")
     def drawText(draw, width, height):
         try:
             departure = departures[departure_id]
         except IndexError:
             return
-        print("renderPlatform->drawText")
         departure = departures[departure_id]
         if "platform" in departure:
             if (departure["platform"].lower() == "bus"):
